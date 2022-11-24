@@ -23,18 +23,18 @@ library(measurements)
 
 # Upload data
 por_data <- readxl::read_excel(
-  here::here("Data", "Input", "Porometry.xlsx"), 
+  here::here("Data","Porometry.xlsx"), 
   skip = 1,
   col_types = c("date", "numeric", "numeric", "text","text", "numeric", "numeric", "numeric"))
 
 por_meta <- readxl::read_excel(
-  here::here("Data", "Input", "Porometry_metadata.xlsx"))
+  here::here("Data", "Porometry_metadata.xlsx"))
 
 pm_meta <- readxl::read_excel(
-  here::here("Data", "Input", "PM_metadata.xlsx"))
+  here::here("Data", "PM_metadata.xlsx"))
 
 herb_data <- read.csv(
-  here::here("Data", "Input", "Herbarium_metadata.csv"))
+  here::here("Data", "Herbarium_metadata.csv"))
 
 #------------------------------------------
 # 2. Edit data ----
