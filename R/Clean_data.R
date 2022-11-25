@@ -39,7 +39,7 @@ herb_data <-
   read.csv(here::here("Data", "Herbarium_metadata.csv"))
 
 pm_data_list <- 
-  list.files(here::here("Data", "PM Raw Data"), 
+  list.files(here::here("Data", "PM_data"), 
              full.names = TRUE) %>% 
   lapply(., read_excel)
   
@@ -142,7 +142,7 @@ pm_data <-
   bind_rows(pm_data_list) %>% 
   dplyr::select(-c("Area")) %>% 
   dplyr::rename(.,
-                pm_id = "Id",leaf_id = "Field",pm_class = "Class",
+                pm_id = "Id",sample_id = "Field",pm_class = "Class",
                 pm_area = "Area (μm²)", pm_ecd = "ECD (μm)",
                 pm_perimeter = "Perimeter (μm)",pm_shape = "Shape",
                 pm_count = "Count",o = "O Wt%",na = "Na Wt%",mg = "Mg Wt%",
@@ -151,7 +151,19 @@ pm_data <-
                 cl = "Cl Wt%",be = "Be Wt%",sb = "Sb Wt%",'in' = "In Wt%",p = "P Wt%",
                 s = "S Wt%",ta = "Ta Wt%",rb = "Rb Wt%",zn = "Zn Wt%",tm = "Tm Wt%",
                 mo = "Mo Wt%",ru = "Ru Wt%")
-                
+     
+pm_meta_clean <-
+  pm_meta %>% 
+  dplyr::select("Tree","Leaf ID","Sample ID","Notes on leaves") %>% 
+  dplyr::rename(.,
+                specimen_specie = "Tree",leaf_id = "Leaf ID",
+                sample_id = "Sample ID", notes = "Notes on leaves") %>% 
+  dplyr::slice(rep(1:n(), 3)) %>% 
+  arrange(.,sample_id) %>% 
+  dplyr::mutate(sample_n = rep(c("A", "B", "C"), (nrow(.)/3)))%>% 
+  tidyr::unite(.,sample_id,
+               "sample_id", "sample_n",
+               sep = "")
 
 # Full dataset 
 #  for stomatal conductance
@@ -167,12 +179,20 @@ por_data_full <-
             by = c("date", "leaf_id")) 
 
 #  for particulate matter
-# TODO join pm_meta by leaf_id
-
+pm_data_full <-
+  full_join(pm_meta_clean,
+            tree_coord,
+            by = "specimen_specie") %>% 
+  right_join(.,
+             pm_data,
+             by = "sample_id")
 
 #------------------------------------------
 # 2. Save data ----
 #------------------------------------------
 
-write_csv(por_data_full, 
+readr::write_csv(por_data_full, 
           here::here("Outputs", "Tcbg_porometry_2022-23-11.csv"))
+
+readr::write_csv(pm_data_full,
+                 here::here("Outputs", "Tcbg_pm_2022-25-11.csv"))
