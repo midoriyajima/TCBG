@@ -20,21 +20,31 @@ library(readxl)
 library(here)
 library(lubridate)
 library(measurements)
+library(purrr)
 
 # Upload data
-por_data <- readxl::read_excel(
-  here::here("Data","Porometry.xlsx"), 
+por_data <- 
+  readxl::read_excel(here::here("Data","Porometry.xlsx"), 
   skip = 1,
-  col_types = c("date", "numeric", "numeric", "text","text", "numeric", "numeric", "numeric"))
+  col_types = c("date", "numeric", "numeric", "text","text", "numeric", 
+                "numeric", "numeric"))
 
-por_meta <- readxl::read_excel(
-  here::here("Data", "Porometry_metadata.xlsx"))
+por_meta <- 
+  readxl::read_excel(here::here("Data", "Porometry_metadata.xlsx"))
 
-pm_meta <- readxl::read_excel(
-  here::here("Data", "PM_metadata.xlsx"))
+pm_meta <- 
+  readxl::read_excel(here::here("Data", "PM_metadata.xlsx"))
 
-herb_data <- read.csv(
-  here::here("Data", "Herbarium_metadata.csv"))
+herb_data <- 
+  read.csv(here::here("Data", "Herbarium_metadata.csv"))
+
+pm_data_list <- 
+  list.files(here::here("Data", "PM Raw Data"), 
+             full.names = TRUE) %>% 
+  lapply(., read_excel)
+  
+pm_data_list[[65]][["Id"]] <- 
+  as.double(pm_data_list[[65]][["Id"]])
 
 #------------------------------------------
 # 2. Edit data ----
@@ -128,8 +138,23 @@ tree_coord$lon <-conv_unit(tree_coord$lon,
   
 tree_coord$lon <- tree_coord$lon*(-1)
 
-  
-# Full dataset
+pm_data <- 
+  bind_rows(pm_data_list) %>% 
+  dplyr::select(-c("Area")) %>% 
+  dplyr::rename(.,
+                pm_id = "Id",leaf_id = "Field",pm_class = "Class",
+                pm_area = "Area (μm²)", pm_ecd = "ECD (μm)",
+                pm_perimeter = "Perimeter (μm)",pm_shape = "Shape",
+                pm_count = "Count",o = "O Wt%",na = "Na Wt%",mg = "Mg Wt%",
+                al = "Al Wt%",si = "Si Wt%",k = "K Wt%",ca = "Ca Wt%",ti = "Ti Wt%",
+                cr = "Cr Wt%",mn = "Mn Wt%",fe = "Fe Wt%",ni = "Ni Wt%",br = "Br Wt%",
+                cl = "Cl Wt%",be = "Be Wt%",sb = "Sb Wt%",'in' = "In Wt%",p = "P Wt%",
+                s = "S Wt%",ta = "Ta Wt%",rb = "Rb Wt%",zn = "Zn Wt%",tm = "Tm Wt%",
+                mo = "Mo Wt%",ru = "Ru Wt%")
+                
+
+# Full dataset 
+#  for stomatal conductance
 por_data_full <-
   full_join(tree_info,
             tree_coord,
@@ -140,11 +165,14 @@ por_data_full <-
   full_join(.,
             por_meta_clean,
             by = c("date", "leaf_id")) 
-  
+
+#  for particulate matter
+# TODO join pm_meta by leaf_id
+
 
 #------------------------------------------
 # 2. Save data ----
 #------------------------------------------
 
 write_csv(por_data_full, 
-          here::here("Outputs", "Data", "Tcbg_porometry_2022-23-11.csv"))
+          here::here("Outputs", "Tcbg_porometry_2022-23-11.csv"))
