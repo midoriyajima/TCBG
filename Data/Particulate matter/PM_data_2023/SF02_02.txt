@@ -1,0 +1,2 @@
+Id	Area	Field	Class	Area (?m²)	ECD (?m)	Perimeter (?m)	Shape	Count	O Wt%	F Wt%	Al Wt%	Si Wt%	Cl Wt%	Ca Wt%	La Wt%	Ce Wt%	Pr Wt%	Nd Wt%	Sm Wt%	Gd Wt%	Dy Wt%
+4		SF02_02	PM10	17.76744656	4.756281695	17.01811873	1.297144077	634	53.29248309	0	20.88343799	18.56902838	1.308595482	0	0	0	1.698022708	0	0	0	4.248431697
