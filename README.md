@@ -1,3 +1,3 @@
-# Code for The Witness Tree Project, Trinity College Botanic Garden long-term monitoring program
+# The Witness Tree Project
 
-Add description
+Code used for managing data generated from Trinity College Botanic Garden long-term monitoring program. 
